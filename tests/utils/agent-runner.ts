@@ -334,7 +334,7 @@ export async function run(config: TestConfig): Promise<AgentMetadata> {
           return;
         }
 
-        if (process.env.DEBUG && !isComplete) {
+        if (process.env.DEBUG) {
           console.log(`=== session event ${event.type}`);
         }
 
@@ -345,9 +345,7 @@ export async function run(config: TestConfig): Promise<AgentMetadata> {
         }
 
         // Capture all events
-        if (!isComplete) {
-          agentMetadata.events.push(event);
-        }
+        agentMetadata.events.push(event);
 
         // Check for early termination
         if (config.shouldEarlyTerminate) {
@@ -374,6 +372,8 @@ export async function run(config: TestConfig): Promise<AgentMetadata> {
     console.error("Agent runner error:", error);
     throw error;
   } finally {
+    // Mark as complete before starting cleanup to prevent post-completion event processing
+    isComplete = true;
     // Cleanup session and client (guarded if undefined)
     try {
       if (session) {
