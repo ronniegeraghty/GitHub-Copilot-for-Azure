@@ -5,9 +5,9 @@
  * where event listeners continue after test completion.
  */
 
-describe('agent-runner', () => {
-  describe('event listener cleanup', () => {
-    test('isComplete flag prevents event processing after completion', () => {
+describe("agent-runner", () => {
+  describe("event listener cleanup", () => {
+    test("isComplete flag prevents event processing after completion", () => {
       // This test verifies the fix for the issue where console.log
       // continues to fire after the test completes/times out.
       
@@ -24,28 +24,28 @@ describe('agent-runner', () => {
       };
       
       // Simulate normal event flow
-      mockEventHandler('session.start');
-      mockEventHandler('assistant.message');
-      mockEventHandler('tool.execution_start');
+      mockEventHandler("session.start");
+      mockEventHandler("assistant.message");
+      mockEventHandler("tool.execution_start");
       
       // Simulate completion
       isComplete = true;
       
       // These events should not be processed
-      mockEventHandler('tool.execution_complete');
-      mockEventHandler('assistant.message_delta');
+      mockEventHandler("tool.execution_complete");
+      mockEventHandler("assistant.message_delta");
       
       // Verify only pre-completion events were recorded
       expect(events).toEqual([
-        'session.start',
-        'assistant.message', 
-        'tool.execution_start'
+        "session.start",
+        "assistant.message", 
+        "tool.execution_start"
       ]);
-      expect(events).not.toContain('tool.execution_complete');
-      expect(events).not.toContain('assistant.message_delta');
+      expect(events).not.toContain("tool.execution_complete");
+      expect(events).not.toContain("assistant.message_delta");
     });
     
-    test('isComplete flag is set on session.idle', () => {
+    test("isComplete flag is set on session.idle", () => {
       let isComplete = false;
       const events: string[] = [];
       
@@ -56,25 +56,25 @@ describe('agent-runner', () => {
         events.push(eventType);
         
         // Simulate the fix: set isComplete when session.idle is received
-        if (eventType === 'session.idle') {
+        if (eventType === "session.idle") {
           isComplete = true;
         }
       };
       
-      mockEventHandler('session.start');
-      mockEventHandler('assistant.message');
-      mockEventHandler('session.idle');
-      mockEventHandler('tool.execution_complete'); // Should not be processed
+      mockEventHandler("session.start");
+      mockEventHandler("assistant.message");
+      mockEventHandler("session.idle");
+      mockEventHandler("tool.execution_complete"); // Should not be processed
       
       expect(events).toEqual([
-        'session.start',
-        'assistant.message',
-        'session.idle'
+        "session.start",
+        "assistant.message",
+        "session.idle"
       ]);
       expect(isComplete).toBe(true);
     });
     
-    test('isComplete flag is set on early termination', () => {
+    test("isComplete flag is set on early termination", () => {
       let isComplete = false;
       const events: string[] = [];
       
@@ -90,15 +90,15 @@ describe('agent-runner', () => {
         }
       };
       
-      mockEventHandler('session.start');
-      mockEventHandler('assistant.message');
-      mockEventHandler('tool.execution_start', true); // Early termination
-      mockEventHandler('tool.execution_complete'); // Should not be processed
+      mockEventHandler("session.start");
+      mockEventHandler("assistant.message");
+      mockEventHandler("tool.execution_start", true); // Early termination
+      mockEventHandler("tool.execution_complete"); // Should not be processed
       
       expect(events).toEqual([
-        'session.start',
-        'assistant.message',
-        'tool.execution_start'
+        "session.start",
+        "assistant.message",
+        "tool.execution_start"
       ]);
       expect(isComplete).toBe(true);
     });
